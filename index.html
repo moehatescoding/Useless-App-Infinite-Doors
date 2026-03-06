@@ -202,6 +202,12 @@
             border-bottom-color: rgba(255, 255, 255, 0.1);
             border-right-color: rgba(255, 255, 255, 0.05);
             box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(255, 255, 255, 0.05), 2px 2px 3px rgba(255, 255, 255, 0.1);
+            -webkit-transform: translateZ(1px);
+            transform: translateZ(1px);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
         }
 
         .panel-top {
@@ -225,6 +231,12 @@
             width: 50px;
             height: 70px;
             pointer-events: none;
+            -webkit-transform: translateZ(1px);
+            transform: translateZ(1px);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
         }
 
         .knocker-base {
@@ -287,6 +299,7 @@
             position: absolute;
             top: 130px;
             left: 50%;
+            -webkit-transform: translateX(-50%) translateZ(2px);
             transform: translateX(-50%) translateZ(2px);
             width: 22px;
             height: 22px;
@@ -296,6 +309,10 @@
             border-bottom-color: #5a4204;
             border-radius: 50%;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8), inset 0 0 5px rgba(245, 166, 35, 0.5);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
         }
 
         .door-glow {
@@ -633,10 +650,41 @@
                 letter-spacing: 1px;
             }
         }
+
+        .spam-popup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            -webkit-transform: translateX(-50%) translateY(-50px);
+            transform: translateX(-50%) translateY(-50px);
+            background: #ff3333;
+            color: #fff;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 20px rgba(255, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .spam-popup.visible {
+            opacity: 1;
+            visibility: visible;
+            -webkit-transform: translateX(-50%) translateY(0);
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 
 <body>
+    <div class="spam-popup" id="spam-popup">Be calm.</div>
 
     <div class="void" id="void">
         <div class="grain"></div>
@@ -878,6 +926,24 @@
         let isOpen = false;
         let currentPool = [];
         let audioCtx;
+        let clickTimes = [];
+
+        function playErrorTone() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        }
 
         function playKnock() {
             if (!audioCtx) {
@@ -936,6 +1002,35 @@
         function handleKnock(e) {
             if (isOpen) return;
             if (e) e.stopPropagation();
+
+            // Spam Detection Logic
+            const nowTime = Date.now();
+            clickTimes.push(nowTime);
+            // Keep only clicks within the last 1500 seconds
+            clickTimes = clickTimes.filter(t => nowTime - t < 1500);
+
+            if (clickTimes.length > 5) { // more than 5 clicks in 1.5 seconds
+                const popup = document.getElementById('spam-popup');
+                popup.classList.add('visible');
+                playErrorTone();
+
+                // Door shudder error animation
+                const door = document.getElementById('door-container');
+                door.style.animation = 'none';
+                void door.offsetWidth;
+                door.animate([
+                    { transform: 'translateX(0) rotateZ(0)' },
+                    { transform: 'translateX(-10px) rotateZ(-2deg)' },
+                    { transform: 'translateX(10px) rotateZ(2deg)' },
+                    { transform: 'translateX(0) rotateZ(0)' }
+                ], { duration: 200, iterations: 2 });
+                setTimeout(() => door.style.animation = '', 400);
+
+                setTimeout(() => popup.classList.remove('visible'), 2000);
+                return; // Block the knock
+            }
+
+
             knockCount++;
             document.getElementById('knock-count').innerText = knockCount;
 
