@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Anti-Gravity Door | Infinite Visitor Experience</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="An interactive zero-gravity experience. Knock on the floating door to meet infinite surreal visitors in the deep space void.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0A0A1A;
+            --door-warm: #F5A623;
+            --accent-neon: #00FFD1;
+            --off-white: #F0EDE6;
+            --door-wood: #5D4037;
+            --door-wood-dark: #3E2723;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--off-white);
+            font-family: 'Nunito', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 2000px;
+        }
+
+        /* --- BACKGROUND VOID --- */
+        .void {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #16162d 0%, #0a0a1a 100%);
+        }
+
+        .nebula {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: drift var(--duration) ease-in-out infinite alternate;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(var(--tx), var(--ty)) scale(1.2);
+            }
+        }
+
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* --- DEBRIS layer --- */
+        .debris-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .debris {
+            position: absolute;
+            opacity: 0.6;
+            animation: zeroG var(--duration) linear infinite;
+        }
+
+        @keyframes zeroG {
+            0% {
+                transform: translate(var(--sx), var(--sy)) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(var(--ex), var(--ey)) rotate(360deg);
+            }
+        }
+
+        /* --- THE DOOR --- */
+        .door-container {
+            position: relative;
+            width: 280px;
+            height: 450px;
+            transform-style: preserve-3d;
+            perspective: 1500px;
+            animation: bobbing 6s ease-in-out infinite;
+            z-index: 5;
+            transition: opacity 1s ease-out, transform 0.1s ease-out;
+        }
+
+        @keyframes bobbing {
+
+            0%,
+            100% {
+                transform: translateY(0) rotateZ(0.5deg) scale(1);
+            }
+
+            50% {
+                transform: translateY(-20px) rotateZ(-0.5deg) scale(1.02);
+            }
+        }
+
+        .door-frame {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 12px solid var(--door-wood-dark);
+            border-top-color: #6a4933;
+            border-left-color: #553926;
+            border-right-color: #26160d;
+            border-bottom-color: #1a0f09;
+            box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(245, 166, 35, 0.1), inset 5px 5px 15px rgba(0, 0, 0, 0.8), inset -5px -5px 15px rgba(0, 0, 0, 0.5);
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transform: translateZ(-5px);
+        }
+
+        .door-leaf {
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            width: calc(100% + 24px);
+            height: calc(100% + 24px);
+            background: linear-gradient(135deg, var(--door-wood), var(--door-wood-dark));
+            border: 4px solid #2e1e1a;
+            border-top-color: #4a3020;
+            border-left-color: #5a3c26;
+            transform-origin: left center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+            cursor: pointer;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.6), 5px 5px 20px rgba(0, 0, 0, 0.6);
+            transform-style: preserve-3d;
+        }
+
+        .door-leaf::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            right: -24px;
+            width: 20px;
+            height: calc(100% + 8px);
+            background: #251610;
+            transform-origin: left center;
+            transform: rotateY(90deg);
+            border: 2px solid #0a0502;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .door-leaf.open {
+            transform: rotateY(-115deg);
+            box-shadow: 25px 15px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Door wood carving details */
+        .wood-panel {
+            position: absolute;
+            border: 4px solid rgba(0, 0, 0, 0.3);
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+            border-right-color: rgba(255, 255, 255, 0.05);
+            box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.7), inset -2px -2px 5px rgba(255, 255, 255, 0.05), 2px 2px 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .panel-top {
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            height: 150px;
+        }
+
+        .panel-bottom {
+            bottom: 30px;
+            left: 30px;
+            right: 30px;
+            height: 180px;
+        }
+
+        .knocker-container {
+            position: absolute;
+            top: 200px;
+            right: 45px;
+            width: 50px;
+            height: 70px;
+            pointer-events: none;
+        }
+
+        .knocker-base {
+            width: 26px;
+            height: 26px;
+            background: radial-gradient(circle at 30% 30%, #fffacd, #b8860b, #5a4204);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 12px;
+            border: 2px solid #3a2a02;
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6), inset -2px -2px 5px rgba(0, 0, 0, 0.4);
+            transform: translateZ(5px);
+        }
+
+        .knocker-ring {
+            width: 44px;
+            height: 55px;
+            border: 7px solid #ffd700;
+            border-bottom-color: #b8860b;
+            border-right-color: #cca300;
+            border-top-color: #ffeb66;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            left: 3px;
+            transform-origin: top center;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.7), inset 2px 2px 5px rgba(255, 255, 255, 0.4), inset -2px -2px 5px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d;
+            transform: translateZ(10px);
+        }
+
+        .knocker-ring.knock-anim {
+            animation: knockRing 0.5s ease-out;
+        }
+
+        @keyframes knockRing {
+            0% {
+                transform: rotateX(0);
+            }
+
+            30% {
+                transform: rotateX(-50deg);
+            }
+
+            50% {
+                transform: rotateX(15deg);
+            }
+
+            70% {
+                transform: rotateX(-5deg);
+            }
+
+            100% {
+                transform: rotateX(0);
+            }
+        }
+
+        .peephole {
+            position: absolute;
+            top: 130px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(2px);
+            width: 22px;
+            height: 22px;
+            background: radial-gradient(circle, #050505, #000, #111);
+            border: 4px solid #b8860b;
+            border-left-color: #ffeb66;
+            border-bottom-color: #5a4204;
+            border-radius: 50%;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8), inset 0 0 5px rgba(245, 166, 35, 0.5);
+        }
+
+        .door-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 20px var(--door-warm);
+            opacity: 0.2;
+            animation: pulseGlow 5s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                opacity: 0.1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* --- COUNTER UI --- */
+        .counter-badge {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(10, 10, 26, 0.9);
+            border: 2px solid var(--accent-neon);
+            padding: 20px 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 255, 209, 0.15);
+            text-align: right;
+            z-index: 100;
+        }
+
+        .counter-badge h2 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 2.2rem;
+            color: var(--accent-neon);
+            margin-bottom: 2px;
+            letter-spacing: 1px;
+        }
+
+        #knock-count {
+            font-size: 2.8rem;
+            text-shadow: 0 0 15px var(--accent-neon);
+            font-weight: 800;
+        }
+
+        .counter-badge p {
+            font-size: 1rem;
+            color: var(--accent-neon);
+            opacity: 0.8;
+            margin-top: -5px;
+            font-family: 'Baloo 2', cursive;
+            text-transform: uppercase;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-family: 'Baloo 2', cursive;
+            font-size: 0.9rem;
+            color: var(--off-white);
+            opacity: 0.5;
+            letter-spacing: 2px;
+            pointer-events: none;
+            z-index: 100;
+            text-transform: uppercase;
+        }
+
+        .knock-pulse {
+            animation: badgePulse 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        @keyframes badgePulse {
+            0% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+                filter: brightness(2);
+            }
+
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+        }
+
+        /* --- VISITOR AREA --- */
+        .visitor-area {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+            z-index: 3;
+            padding: 10px;
+        }
+
+        .visitor-area.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .character-name {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.4rem;
+            color: var(--door-warm);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transform: translateY(-20px);
+            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .visible .character-name {
+            transform: translateY(0);
+        }
+
+        .character-graphic {
+            width: 150px;
+            height: 150px;
+            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.8));
+            animation: floatChar 4s ease-in-out infinite;
+        }
+
+        @keyframes floatChar {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        .speech-bubble {
+            background: var(--off-white);
+            color: var(--bg-deep);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transform: scale(0);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 90%;
+            text-align: center;
+            position: relative;
+        }
+
+        .visible .speech-bubble {
+            transform: scale(1);
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-bottom: 12px solid var(--off-white);
+        }
+
+        .close-door-btn {
+            margin-top: 20px;
+            background: rgba(0, 255, 209, 0.1);
+            border: 2px solid var(--accent-neon);
+            color: var(--accent-neon);
+            padding: 10px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 900;
+            font-family: 'Nunito', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .close-door-btn:hover {
+            background: var(--accent-neon);
+            color: var(--bg-deep);
+            box-shadow: 0 0 15px var(--accent-neon);
+        }
+
+        /* --- RECURSIVE TUNNEL --- */
+        .infinite-tunnel {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        .infinite-tunnel.visible {
+            opacity: 1;
+        }
+
+        .tunnel-layer {
+            position: absolute;
+            width: 80%;
+            height: 85%;
+            border: 2px solid var(--door-wood-dark);
+            box-shadow: 0 0 20px var(--door-warm);
+            animation: zoomOut 3s linear infinite;
+        }
+
+        @keyframes zoomOut {
+            from {
+                transform: scale(2);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            to {
+                transform: scale(0.1);
+                opacity: 0;
+            }
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="void" id="void">
+        <div class="grain"></div>
+    </div>
+
+    <div class="debris-layer" id="debris-layer"></div>
+
+    <div class="counter-badge" id="counter-badge" aria-live="polite">
+        <h2
+            style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px;">
+            Useless App - Infinite Doors</h2>
+        <h2>KNOCKS: <span id="knock-count">0</span></h2>
+        <p id="status-hint">Who's next...?</p>
+    </div>
+
+    <div class="door-container" id="door-container">
+        <div class="door-frame" aria-label="A mysterious floating door">
+            <div class="infinite-tunnel" id="infinite-tunnel"></div>
+
+            <div class="visitor-area" id="visitor-area">
+                <div class="character-name" id="char-name">Visitor</div>
+                <div class="character-graphic" id="char-graphic"></div>
+                <div class="speech-bubble" id="char-speech">"..."</div>
+                <button class="close-door-btn" id="close-door">Close Door 🚪</button>
+            </div>
+        </div>
+
+        <div class="door-leaf" id="door-leaf" aria-label="Knock on the door" role="button">
+            <div class="door-glow"></div>
+            <div class="wood-panel panel-top"></div>
+            <div class="wood-panel panel-bottom"></div>
+            <div class="peephole"></div>
+            <div class="knocker-container">
+                <div class="knocker-base"></div>
+                <div class="knocker-ring" id="knocker-ring"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- ASSETS & ART ---
+        const SVG_ART = {
+            goldfish: `<svg viewBox="0 0 100 100" style="width:100%;height:100%"><circle cx="50" cy="50" r="45" fill="rgba(0,255,209,0.1)" stroke="cyan" stroke-dasharray="5 5"/><ellipse cx="50" cy="55" rx="20" ry="12" fill="orange"/><path d="M70 55 L85 45 L85 65 Z" fill="orange"/><circle cx="40" cy="52" r="3" fill="black"/><path d="M45 60 Q50 65 55 60" fill="none" stroke="red"/></svg>`,
+            ghost: `<svg viewBox="0 0 100 100" style="width:100%;height:100%"><path d="M30 80 Q30 20 50 20 Q70 20 70 80 Q60 70 50 80 Q40 70 30 80" fill="white" opacity="0.8"/><circle cx="42" cy="45" r="4" fill="black"/><circle cx="58" cy="45" r="4" fill="black"/><ellipse cx="50" cy="65" rx="10" ry="5" fill="black"/></svg>`,
+            alien: `<svg viewBox="0 0 100 100" style="width:100%;height:100%"><path d="M30 40 Q50 0 70 40 Q70 80 50 80 Q30 80 30 40" fill="#7ed321"/><ellipse cx="40" cy="40" rx="8" ry="12" fill="black" transform="rotate(-20 40 40)"/><ellipse cx="60" cy="40" rx="8" ry="12" fill="black" transform="rotate(20 60 40)"/><rect x="35" y="85" width="30" height="10" fill="white"/><text x="40" y="93" fill="black" font-size="8" font-family="sans-serif">REJECT</text></svg>`,
+            dragon: `<svg viewBox="0 0 100 100" style="width:100%;height:100%"><path d="M30 60 Q20 30 50 20 Q80 30 70 60 L50 70 Z" fill="#e74c3c"/><circle cx="42" cy="40" r="3" fill="gold"/><circle cx="58" cy="40" r="3" fill="gold"/><path d="M50 75 Q70 85 90 75" fill="none" stroke="orange" stroke-width="5" opacity="0.8"/></svg>`,
+            knight: `<svg viewBox="0 0 100 100" style="width:100%;height:100%"><rect x="30" y="20" width="40" height="50" rx="10" fill="#bdc3c7"/><rect x="30" y="40" width="40" height="8" fill="#333"/><path d="M50 10 L50 20 M40 15 L60 15" stroke="red" stroke-width="2"/></svg>`,
+            cat: `<svg viewBox="0 0 100 100" style="width:100%;height:100%"><circle cx="50" cy="50" r="35" fill="#2c3e50"/><path d="M25 25 L40 45 L15 40 Z" fill="#2c3e50"/><path d="M75 25 L60 45 L85 40 Z" fill="#2c3e50"/><circle cx="40" cy="45" r="6" fill="#f1c40f"/><circle cx="60" cy="45" r="6" fill="#f1c40f"/><circle cx="60" cy="45" r="8" fill="none" stroke="gold" stroke-width="2"/><circle cx="50" cy="65" r="5" fill="#e74c3c" opacity="0.5"/></svg>`,
+            traveler: `<svg viewBox="0 0 100 100" style="width:100%;height:100%"><rect x="25" y="30" width="50" height="40" rx="10" fill="#3498db"/><rect x="30" y="35" width="40" height="30" fill="#000"/><text x="35" y="55" fill="#0f0" font-family="monospace" font-size="10">88 MPH</text></svg>`,
+            fridge: `<svg viewBox="0 0 100 100" style="width:100%;height:100%"><rect x="30" y="10" width="40" height="80" fill="#ecf0f1"/><line x1="62" y1="40" x2="62" y2="60" stroke="#7f8c8d" stroke-width="5"/><circle cx="38" cy="30" r="3" fill="blue"/><circle cx="38" cy="45" r="2" fill="#999"/></svg>`,
+            wizard: `<svg viewBox="0 0 100 100" style="width:100%;height:100%"><path d="M50 5 L90 80 L10 80 Z" fill="#8e44ad"/><circle cx="50" cy="90" r="10" fill="#f1c40f"/><path d="M40 85 Q50 80 60 85" fill="none" stroke="black"/></svg>`,
+            infinite: `<svg viewBox="0 0 100 100" style="width:100%;height:100%"><rect x="20" y="10" width="60" height="80" fill="none" stroke="var(--door-warm)" stroke-width="2"/><rect x="30" y="25" width="40" height="50" fill="none" stroke="var(--door-warm)" stroke-width="1"/><rect x="40" y="40" width="20" height="20" fill="none" stroke="var(--door-warm)" stroke-width="0.5"/></svg>`
+        };
+
+        const MEME_ART = {
+            uncle: (color) => `<svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="25" fill="#fbd38d"/><circle cx="50" cy="110" r="45" fill="${color}"/><rect x="35" y="35" width="30" height="4" fill="#4a5568"/><circle cx="40" cy="45" r="2" fill="black"/><circle cx="60" cy="45" r="2" fill="black"/><path d="M45 55 Q50 60 55 55" fill="none" stroke="black" stroke-width="2"/><rect x="42" y="20" width="16" height="10" fill="#2d3748"/><path d="M30 40 Q25 35 20 40" stroke="white" fill="none"/></svg>`,
+            bro: (color, acc) => `<svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="25" fill="#ed8936"/><path d="M20 100 Q50 60 80 100" fill="${color}"/><rect x="30" y="38" width="40" height="8" fill="black" opacity="0.8"/><circle cx="40" cy="42" r="2" fill="white"/><circle cx="60" cy="42" r="2" fill="white"/>${acc}</svg>`,
+            mom: () => `<svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="25" fill="#fbd38d"/><path d="M25 80 L75 80 L50 110 Z" fill="#e53e3e"/><circle cx="50" cy="35" r="28" fill="none" stroke="black" stroke-width="8" stroke-dasharray="0 40"/><path d="M40 70 L30 90" stroke="#718096" stroke-width="5" transform="rotate(20 40 70)"/><text x="25" y="95" font-size="20">👡</text></svg>`,
+            tech: () => `<svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="25" fill="#fbd38d"/><rect x="20" y="40" width="10" height="20" rx="2" fill="black"/><rect x="70" y="40" width="10" height="20" rx="2" fill="black"/><path d="M30 50 L70 50" stroke="black" stroke-width="2"/><path d="M40 65 L60 65" stroke="red" stroke-width="3"/><rect x="40" y="70" width="20" height="25" fill="#3182ce"/><text x="45" y="85" font-size="8" fill="white">REC</text></svg>`,
+            generic: (face, body, extra) => `<svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="25" fill="${face}"/><path d="M30 100 Q50 70 70 100" fill="${body}"/>${extra}</svg>`
+        };
+
+        const MEME_VISITORS = [
+            { name: "WhatsApp Uncle", art: MEME_ART.uncle("#2f855a"), speech: "Forward this door to 10 people or it closes forever." },
+            { name: "Gym Trainer Bro", art: MEME_ART.bro("#2d3748", '<rect x="40" y="60" width="20" height="30" fill="silver"/><circle cx="50" cy="65" r="5" fill="black"/>'), speech: "Door khol… aur 5 reps aur kar." },
+            { name: "Crypto Bro", art: MEME_ART.bro("#553c9a", '<text x="38" y="42" font-size="15">🕶️</text><text x="42" y="85" font-size="10" fill="gold">₿</text>'), speech: "Bro this door is going to the moon." },
+            { name: "Startup Founder", art: MEME_ART.generic("#fbd38d", "#2d3748", '<rect x="40" y="40" width="20" height="4" fill="black"/><text x="35" y="85" font-size="8" fill="white">DISRUPT</text>'), speech: "We’re not opening doors… we’re disrupting them." },
+            { name: "Indian Mom", art: MEME_ART.mom(), speech: "Door khol diya? Ab band bhi tum hi karoge." },
+            { name: "Hostel Roommate", art: MEME_ART.generic("#fbd38d", "#ecc94b", '<path d="M40 50 Q50 55 60 50" stroke="black"/><text x="40" y="85" font-size="15">🍕</text>'), speech: "Bro fridge mein kuch hai kya?" },
+            { name: "Bollywood Villain", art: MEME_ART.generic("#744210", "#000", '<path d="M35 50 Q50 40 65 50" stroke="black" stroke-width="2"/><text x="40" y="45" font-size="15">🧐</text>'), speech: "Darwaza khula hai… lekin kismat band." },
+            { name: "Overdramatic Hero", art: MEME_ART.generic("#fbd38d", "#e53e3e", '<path d="M20 70 Q50 40 80 70" fill="red" opacity="0.5"/><text x="45" y="55" font-size="15">😭</text>'), speech: "Yeh darwaza nahi… meri destiny hai." },
+            { name: "Tech YouTuber", art: MEME_ART.tech(), speech: "So guys today we are unboxing… a door." },
+            { name: "Instagram Influencer", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<circle cx="50" cy="40" r="30" fill="none" stroke="cyan" stroke-width="2" opacity="0.5"/><text x="40" y="85" font-size="15">📸</text>'), speech: "Wait… let me open it again for the reel." },
+            { name: "Conspiracy Uncle", art: MEME_ART.uncle("#4a5568"), speech: "This door is controlled by satellites." },
+            { name: "MBA Speaker", art: MEME_ART.generic("#fbd38d", "#2b6cb0", '<rect x="42" y="38" width="16" height="4" fill="black"/><text x="40" y="85" font-size="15">📈</text>'), speech: "Don’t open doors. Become the door." },
+            { name: "Chai Stall Philo", art: MEME_ART.generic("#fbd38d", "#dd6b20", '<circle cx="50" cy="80" r="10" fill="#fffaf0" stroke="#845ef7"/><text x="45" y="85" font-size="12">☕</text>'), speech: "Life bhi ek darwaza hai beta." },
+            { name: "Angry Watchman", art: MEME_ART.generic("#fbd38d", "#2d3748", '<rect x="35" y="20" width="30" height="10" fill="#1a202c"/><text x="40" y="85" font-size="15">📝</text>'), speech: "Kidhar ja rahe ho? Entry register mein naam likho." },
+            { name: "Fitness Influencer", art: MEME_ART.generic("#fbd38d", "#38a169", '<text x="40" y="85" font-size="15">🥑</text><circle cx="60" cy="40" r="5" fill="none" stroke="white"/>'), speech: "Opening doors burns 3 calories." },
+            { name: "Cricket Comm", art: MEME_ART.generic("#fbd38d", "#2d3748", '<rect x="45" y="50" width="10" height="40" fill="#333"/><circle cx="50" cy="50" r="8" fill="white"/>'), speech: "And that door… has opened beautifully!" },
+            { name: "Politician", art: MEME_ART.generic("#fbd38d", "#fff", '<path d="M30 80 L70 80" stroke="orange" stroke-width="4"/><text x="45" y="25" font-size="15">🇮🇳</text>'), speech: "Yeh darwaza bhi mere saath hai." },
+            { name: "PUBG Gamer", art: MEME_ART.generic("#fbd38d", "#2d3748", '<rect x="30" y="30" width="40" height="30" rx="10" fill="gray"/><text x="40" y="85" font-size="15">🔫</text>'), speech: "Door open… enemy ahead!" },
+            { name: "Astrology Guru", art: MEME_ART.generic("#fbd38d", "#ed8936", '<circle cx="50" cy="30" r="2" fill="white" stroke="yellow"/><text x="40" y="85" font-size="15">🌙</text>'), speech: "Aaj aapke grah darwaze khol rahe hain." },
+            { name: "Engineering Student", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="42" y="45" font-size="15">🥱</text><rect x="30" y="80" width="40" height="10" fill="white"/>'), speech: "Door khol diya… ab assignment kab khulega?" },
+            { name: "HR Manager", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<rect x="40" y="40" width="20" height="4" fill="black"/><text x="40" y="85" font-size="15">📅</text>'), speech: "Let’s circle back to this door." },
+            { name: "Startup Intern", art: MEME_ART.generic("#fbd38d", "#4299e1", '<text x="42" y="45" font-size="15">🥺</text><text x="42" y="85" font-size="12">☕</text>'), speech: "Should I pivot the door?" },
+            { name: "Choreographer", art: MEME_ART.generic("#fbd38d", "#9f7aea", '<path d="M30 60 L40 50 L50 60 L60 50 L70 60" fill="none" stroke="white"/><text x="42" y="85" font-size="12">🕺</text>'), speech: "Door khol… 5-6-7-8!" },
+            { name: "Fake Baba", art: MEME_ART.generic("#fbd38d", "#ed8936", '<path d="M30 30 Q50 0 70 30" fill="orange"/><text x="40" y="85" font-size="15">✨</text>'), speech: "Door khulega… jab tum ready hoge." },
+            { name: "Late Night Poet", art: MEME_ART.generic("#fbd38d", "#1a202c", '<text x="42" y="45" font-size="15">🚬</text><text x="42" y="85" font-size="15">🍷</text>'), speech: "Darwaza khula… dil bhi." },
+            { name: "Tech Support", art: MEME_ART.generic("#fbd38d", "#2d3748", '<rect x="70" y="40" width="8" height="20" fill="black"/><path d="M50 50 L70 50" stroke="black"/>'), speech: "Sir please close the door and open again." },
+            { name: "Uber Driver", art: MEME_ART.generic("#fbd38d", "#718096", '<rect x="35" y="30" width="30" height="20" fill="black"/><text x="40" y="85" font-size="15">🚗</text>'), speech: "Sir location galat door pe hai." },
+            { name: "Broke Crypto", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="42" y="45" font-size="15">💸</text><text x="42" y="85" font-size="15">📉</text>'), speech: "This door also crashed." },
+            { name: "AI Founder", art: MEME_ART.generic("#fbd38d", "#000", '<circle cx="50" cy="40" r="30" fill="none" stroke="cyan" opacity="0.3"/><text x="40" y="85" font-size="10" fill="cyan">AI</text>'), speech: "This door is powered by AI." },
+            { name: "Stand-up Comic", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="42" y="45" font-size="15">🤡</text><rect x="45" y="70" width="10" height="30" fill="silver"/>'), speech: "I opened the door… audience still didn’t laugh." },
+            { name: "News Anchor", art: MEME_ART.generic("#fbd38d", "#e53e3e", '<rect x="20" y="30" width="60" height="15" fill="black"/><text x="25" y="42" font-size="8" fill="white">LIVE</text>'), speech: "Breaking news! Door has opened!" },
+            { name: "Relative", art: MEME_ART.generic("#fbd38d", "#f6e05e", '<text x="42" y="45" font-size="15">🤨</text><text x="42" y="85" font-size="15">💰</text>'), speech: "Beta salary kitni hai?" },
+            { name: "Food Vlogger", art: MEME_ART.generic("#fbd38d", "#dd6b20", '<text x="42" y="45" font-size="15">😋</text><text x="42" y="85" font-size="15">🍔</text>'), speech: "Today we are tasting… this door." },
+            { name: "Bkg Dancer", art: MEME_ART.generic("#fbd38d", "#cbd5e0", '<text x="42" y="45" font-size="15">🕺</text><text x="42" y="85" font-size="15">✨</text>'), speech: "Main bas entry ke liye aaya hoon." },
+            { name: "Consultant", art: MEME_ART.generic("#fbd38d", "#2c5282", '<rect x="40" y="38" width="20" height="4" fill="black"/><text x="40" y="85" font-size="10" fill="white">ROI</text>'), speech: "We need a strategy for this door." },
+            { name: "Sleepy Coder", art: MEME_ART.generic("#fbd38d", "#1a202c", '<text x="42" y="45" font-size="15">😵‍💫</text><text x="35" y="85" font-size="8" fill="#0f0">BUG</text>'), speech: "This door has a bug." },
+            { name: "Prod Guru", art: MEME_ART.generic("#fbd38d", "#2f855a", '<text x="42" y="45" font-size="15">⏰</text><text x="42" y="85" font-size="15">📓</text>'), speech: "Wake up at 5AM and open doors." },
+            { name: "Finance Bro", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="42" y="45" font-size="15">🤑</text><text x="42" y="85" font-size="15">💹</text>'), speech: "Door ROI is strong." },
+            { name: "Meme Kid", art: MEME_ART.generic("#fbd38d", "#ed8936", '<text x="42" y="45" font-size="15">😏</text><text x="40" y="85" font-size="10">SUS</text>'), speech: "Bro this door is sus." },
+            { name: "Comment Guy", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="42" y="45" font-size="15">💬</text><text x="40" y="85" font-size="10">#1</text>'), speech: "First." },
+            { name: "Scriptwriter", art: MEME_ART.generic("#fbd38d", "#744210", '<text x="42" y="45" font-size="15">✍️</text><text x="30" y="85" font-size="8">PLOT</text>'), speech: "Plot twist: another door." },
+            { name: "Protein Bro", art: MEME_ART.bro("#2d3748", '<circle cx="50" cy="80" r="10" fill="gray"/><text x="45" y="85" font-size="8">P</text>'), speech: "Door khol… protein le." },
+            { name: "Pitch Guy", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="42" y="45" font-size="12">📢</text><text x="40" y="85" font-size="10">PITCH</text>'), speech: "Imagine Uber… but for doors." },
+            { name: "Late Employee", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="42" y="45" font-size="15">🏃‍♂️</text><text x="42" y="85" font-size="15">👔</text>'), speech: "Boss ne bola tha door khol." },
+            { name: "Professor", art: MEME_ART.generic("#fbd38d", "#718096", '<rect x="35" y="38" width="30" height="4" fill="black"/><text x="42" y="85" font-size="15">🎓</text>'), speech: "This door will come in the exam." },
+            { name: "Salesman", art: MEME_ART.generic("#fbd38d", "#2b6cb0", '<text x="42" y="45" font-size="15">💼</text><text x="42" y="85" font-size="15">🤝</text>'), speech: "Sir premium door package le lijiye." },
+            { name: "Conspiracy YT", art: MEME_ART.tech(), speech: "Government doesn’t want you to see this door." },
+            { name: "Spiritual Influencer", art: MEME_ART.generic("#fbd38d", "#fff", '<text x="42" y="45" font-size="15">🧘</text><text x="42" y="85" font-size="15">🕉️</text>'), speech: "The door was always inside you." },
+            { name: "Henchman", art: MEME_ART.generic("#fbd38d", "#000", '<text x="42" y="45" font-size="15">🕶️</text><text x="42" y="85" font-size="15">🔪</text>'), speech: "Boss ne bheja hai." },
+            { name: "Internet Troll", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="42" y="45" font-size="15">👺</text><text x="40" y="85" font-size="10">LMAO</text>'), speech: "Fake door." }
+        ];
+
+        const VISITORS = [
+            { id: 1, name: "Bubble Trouble", art: SVG_ART.goldfish, speech: "Blurp. Is this Mars?" },
+            { id: 2, name: "Sir Booo-a-lot", art: SVG_ART.ghost, speech: "DO YOU MIND?! I'm haunting here!" },
+            { id: 3, name: "Zog of Sector 7", art: SVG_ART.alien, speech: "Incorrect dimension. File a form." },
+            { id: 4, name: "Sleepy Ember", art: SVG_ART.dragon, speech: "Five... more... centuries..." },
+            { id: 5, name: "Sir No-Body", art: SVG_ART.knight, speech: "Pardon? My torso went left." },
+            { id: 6, name: "The High Judge", art: SVG_ART.cat, speech: "You are found... lacking snacks." },
+            { id: 7, name: "McFly's Outlaw", art: SVG_ART.traveler, speech: "Whoa, heavy! What year is it?" },
+            { id: 8, name: "Frosty 3000", art: SVG_ART.fridge, speech: "Beep. Would you like a grape?" },
+            { id: 9, name: "Mistake Merlin", art: SVG_ART.wizard, speech: "BOOM! Wrong spell again." },
+            { id: 10, name: "The Void Master", art: SVG_ART.infinite, speech: "Beware the recursion..." }
+        ];
+
+        const REGIONAL_VISITORS = [
+            { name: "Hyderabadi Guy", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">🥘</text>'), speech: "Biryani hai kya… ya bas door hi khul raha?" },
+            { name: "Hyderabadi Chai Dost", art: MEME_ART.generic("#fbd38d", "#ed8936", '<text x="45" y="85" font-size="15">☕</text>'), speech: "Arre miyaan… chai lao pehle." },
+            { name: "Hyderabadi Tech Bro", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="35" y="85" font-size="8" fill="red">SERVER 404</text>'), speech: "Server down hai kya miyaan?" },
+            { name: "Mumbai Local Guy", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="40" y="85" font-size="15">🚈</text>'), speech: "Vada pav hai kya boss?" },
+            { name: "Mumbai Auto Driver", art: MEME_ART.generic("#fbd38d", "#ecc94b", '<text x="40" y="85" font-size="12">🛺</text>'), speech: "Meter se door khulega kya?" },
+            { name: "Mumbai Hustler", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="45" y="45" font-size="12">⌚</text>'), speech: "Bhai time nahi hai, agla door khol." },
+            { name: "Delhi Guy", art: MEME_ART.generic("#fbd38d", "#e53e3e", '<text x="40" y="25" font-size="15">🚘</text>'), speech: "Bhai tu jaanta hai mera baap kaun hai?" },
+            { name: "Delhi Gym Bro", art: MEME_ART.bro("#2d3748", '<text x="40" y="85" font-size="15">🥤</text>'), speech: "Protein shake andar hai kya?" },
+            { name: "Delhi Influencer", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<text x="40" y="85" font-size="15">🤳</text>'), speech: "Reel bana le pehle." },
+            { name: "Punjabi Bro", art: MEME_ART.generic("#fbd38d", "#2f855a", '<path d="M30 30 Q50 10 70 30" fill="navy"/><text x="40" y="85" font-size="15">🍲</text>'), speech: "Oye door khula… par khana kithhe aa?" },
+            { name: "Punjabi Party Guy", art: MEME_ART.generic("#fbd38d", "#9f7aea", '<text x="40" y="85" font-size="15">🕺</text>'), speech: "Balle balle! Hor ek door!" },
+            { name: "Gujarati Biz Guy", art: MEME_ART.generic("#fbd38d", "#fff", '<text x="40" y="85" font-size="15">💰</text>'), speech: "Profit kya hai is door mein?" },
+            { name: "Gujarati Uncle", art: MEME_ART.uncle("#2b6cb0"), speech: "Discount milega kya?" },
+            { name: "Bangalore Tech Guy", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="35" y="85" font-size="8" fill="#0f0">DEPLOYED</text>'), speech: "Bro deployment ho gaya kya?" },
+            { name: "Bangalore Startup Bro", art: MEME_ART.generic("#fbd38d", "#000", '<text x="40" y="85" font-size="10">MVP</text>'), speech: "Door ka MVP ready hai." },
+            { name: "Kerala Uncle", art: MEME_ART.generic("#fbd38d", "#fff", '<text x="40" y="85" font-size="15">🌴</text>'), speech: "Chaya kudicho?" },
+            { name: "Chennai Anna", art: MEME_ART.generic("#fbd38d", "#fff", '<text x="40" y="85" font-size="15">🎥</text>'), speech: "Door open panna… next scene varum." },
+            { name: "UP Guy", art: MEME_ART.generic("#fbd38d", "#fff", '<text x="40" y="85" font-size="15">🔫</text>'), speech: "Yeh door humne khola hai." },
+            { name: "Indian Dad", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="42" y="45" font-size="15">👓</text><rect x="45" y="80" width="10" height="20" fill="gray"/>'), speech: "Light band karke door band karo." },
+            { name: "Salary Auntie", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<text x="42" y="45" font-size="15">🧐</text><text x="42" y="85" font-size="15">💸</text>'), speech: "Beta… salary kitni hai ab?" },
+            { name: "Marriage Uncle", art: MEME_ART.generic("#fbd38d", "#2c5282", '<text x="42" y="45" font-size="15">💍</text>'), speech: "Tumhari shaadi kab hai?" },
+            { name: "Comparison Auntie", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<text x="42" y="45" font-size="15">😒</text><text x="40" y="85" font-size="8">SHARMA JI</text>'), speech: "Sharma ji ka beta already settled." },
+            { name: "Career Uncle", art: MEME_ART.generic("#fbd38d", "#718096", '<text x="40" y="85" font-size="10">GOVT JOB</text>'), speech: "Government job try karo beta." },
+            { name: "Weight Auntie", art: MEME_ART.generic("#fbd38d", "#f6e05e", '<text x="42" y="45" font-size="15">🥯</text>'), speech: "Thoda healthy ho gaye ho na?" },
+            { name: "Child Question Auntie", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<text x="42" y="85" font-size="15">🍼</text>'), speech: "Next good news kab de rahe ho?" },
+            { name: "Investment Uncle", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="42" y="85" font-size="15">💹</text>'), speech: "Mutual fund mein daalo paisa." },
+            { name: "IT Job Relative", art: MEME_ART.generic("#fbd38d", "#1a202c", '<text x="42" y="85" font-size="10">APP?</text>'), speech: "Coding karte ho? App bana do." },
+            { name: "Matchmaker", art: MEME_ART.generic("#fbd38d", "#9f7aea", '<text x="42" y="85" font-size="15">👰</text>'), speech: "Mere paas ek rishta hai." },
+            { name: "Long-Lost Relative", art: MEME_ART.generic("#fbd38d", "#718096", '<text x="42" y="45" font-size="15">🤔</text>'), speech: "Pehchana mujhe?" },
+            { name: "Engineering Student", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="40" y="85" font-size="15">📚</text>'), speech: "Exam mein yeh door aayega kya?" },
+            { name: "Indian Dad", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="42" y="45" font-size="15">👓</text><rect x="45" y="80" width="10" height="20" fill="gray"/>'), speech: "Light band karke door band karo." },
+            { name: "Wedding Relative", art: MEME_ART.generic("#fbd38d", "#f6e05e", '<text x="42" y="45" font-size="15">💍</text>'), speech: "Beta salary kitni hai?" },
+            { name: "Food Vlogger", art: MEME_ART.generic("#fbd38d", "#dd6b20", '<text x="40" y="85" font-size="15">👅</text>'), speech: "Aaj hum taste karenge… door." },
+            { name: "Stand-up Comedian", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="42" y="45" font-size="15">🤡</text>'), speech: "Door khula… meri life bhi." }
+        ];
+
+        const BATCH_VISITORS = [
+            { name: "Family Doctor", art: MEME_ART.generic("#fbd38d", "#fff", '<rect x="40" y="40" width="20" height="4" fill="red"/><path d="M50 50 L50 80" stroke="silver"/>'), speech: "Door kholne se pehle BP check kar lo beta." },
+            { name: "Chartered Accountant", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="10" fill="white">TAX</text>'), speech: "This door ka depreciation 10% per year hai, tax saving mein use karo." },
+            { name: "Wedding Aunty", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<text x="42" y="85" font-size="15">👰</text>'), speech: "Arre beta, yeh door kab khulega? Ladki dekhne aaye hain!" },
+            { name: "JEE Aspirant", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="40" y="85" font-size="15">📔</text>'), speech: "Door khulne ke liye 16 hours padhna padega bhai." },
+            { name: "Call Center Rajesh", art: MEME_ART.generic("#fbd38d", "#2d3748", '<path d="M70 40 L80 40 L80 60 L70 60" fill="black"/>'), speech: "Thank you for calling Door Services, my name is Rajesh, how may I assist you?" },
+            { name: "Traffic Police", art: MEME_ART.generic("#fbd38d", "#f6e05e", '<rect x="45" y="60" width="10" height="30" fill="silver"/><text x="40" y="25" font-size="15">👮</text>'), speech: "Sir yeh door illegal parking mein hai, challan kaatna padega." },
+            { name: "Delhi Metro Uncle", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="40" y="85" font-size="15">🚇</text>'), speech: "Stand clear of the doors… arrey khul kyun nahi raha bhai?" },
+            { name: "Mom in Kitchen", art: MEME_ART.mom(), speech: "Door khula chhod diya tune? Bill badhega electricity ka!" },
+            { name: "Pakistani Commentator", art: MEME_ART.generic("#fbd38d", "#2f855a", '<text x="40" y="85" font-size="15">🏏</text>'), speech: "And the door… is… OPEN! What a comeback by India!" },
+            { name: "UPSC Aspirant", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="35" y="85" font-size="8" fill="white">ESSAY</text>'), speech: "Yeh door prelims clear nahi karega, mains ke liye essay likhna padega." },
+            { name: "Tupperware Aunty", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<circle cx="50" cy="80" r="10" fill="cyan" opacity="0.5"/>'), speech: "Beta isme khana rakh lo, door khullega toh fresh rahega!" },
+            { name: "Software Tester", art: MEME_ART.generic("#fbd38d", "#1a202c", '<text x="40" y="85" font-size="8" fill="red">CRASH</text>'), speech: "Door opened successfully in staging, but production mein crash ho gaya." },
+            { name: "Railway TT", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="45" y="85" font-size="15">🎫</text>'), speech: "Sir ticket dikhao… yeh door berth number 42 hai?" },
+            { name: "LIC Agent", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">📄</text>'), speech: "Beta life insurance le lo, door kabhi bhi band ho sakta hai." },
+            { name: "Zomato Boy", art: MEME_ART.generic("#fbd38d", "#e53e3e", '<text x="40" y="85" font-size="15">🥡</text>'), speech: "Sir door khol do, biryani thandi ho jayegi." },
+            { name: "Sarkari Babu", art: MEME_ART.generic("#fbd38d", "#cbd5e0", '<text x="42" y="85" font-size="15">📁</text>'), speech: "File pending hai… door 3 mahine baad khulega." },
+            { name: "IPL Auctioneer", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">🔨</text>'), speech: "Sold! Yeh door 20 crore mein gaya!" },
+            { name: "Panipuri Wala", art: MEME_ART.generic("#fbd38d", "#ed8936", '<circle cx="50" cy="80" r="5" fill="beige"/>'), speech: "Ek plate 20 rupaye… door khol ke khao, teekha free!" },
+            { name: "AI Chatbot", art: MEME_ART.generic("#fbd38d", "#000", '<text x="45" y="45" font-size="15">🤖</text>'), speech: "Analyzing door status… 69% chance it's stuck. Suggestion: Offer it chai." }
+        ];
+
+        const BOLLYWOOD_VISITORS = [
+            { name: "Shah Rukh Khan", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">🕶️</text>'), speech: "Palat… palat… palat! Yeh darwaza palat nahi raha, dil se dil tak ka distance badh gaya!" },
+            { name: "Amitabh Bachchan", art: MEME_ART.generic("#fbd38d", "#1a202c", '<text x="40" y="30" font-size="15">🧣</text><text x="40" y="85" font-size="12">🎖️</text>'), speech: "Mere paas darwaza khulne ki kismat hai… tumhare paas sirf knock karne ka haq hai!" },
+            { name: "Salman Khan", art: MEME_ART.generic("#fbd38d", "#2b6cb0", '<text x="40" y="85" font-size="15">💪</text>'), speech: "Swag se sab kuch… darwaza bhi swag se khulega! shirt utaar ke push …Bhai fail ho gaya!" },
+            { name: "Akshay Kumar", art: MEME_ART.generic("#fbd38d", "#ecc94b", '<text x="40" y="85" font-size="15">🤣</text>'), speech: "Baburao ka style hai! Darwaza kholne ka: utha le re baba, khud hi khul ja re!" },
+            { name: "Aamir Khan", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">🎓</text>'), speech: "All izz well… darwaza band hai toh kya, dimag se engineering kar ke khol lenge!" },
+            { name: "Hrithik Roshan", art: MEME_ART.generic("#fbd38d", "#4299e1", '<text x="40" y="85" font-size="15">🕺</text>'), speech: "Itni shiddat se maine tumhe paane ki koshish ki… darwaza khul ja na yaar, one last dance!" },
+            { name: "Ajay Devgn", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">🦁</text>'), speech: "Aata majhi satakli! Darwaza khol, warna satak ke andar aa jaunga!" },
+            { name: "Ranbir Kapoor", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="40" y="85" font-size="15">🎸</text>'), speech: "Pata hai yahan se bahut door… darwaza ke paar ek maidan hai… wahan milunga jab yeh khulega!" },
+            { name: "Ranveer Singh", art: MEME_ART.generic("#fbd38d", "#e53e3e", '<text x="40" y="85" font-size="15">🔥</text>'), speech: "Khamosh! Darwaza khula toh khamoshi khatam — entry maarega full volume!" },
+            { name: "Deepika Padukone", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<text x="40" y="85" font-size="15">✨</text>'), speech: "1 2 3 4… get on the floor… darwaza khol do na please, slow motion mein!" },
+            { name: "Alia Bhatt", art: MEME_ART.generic("#fbd38d", "#f6e05e", '<text x="40" y="85" font-size="15">🎒</text>'), speech: "Mujhe jo karna hai, woh main karungi… darwaza kholungi ya todungi, simple!" },
+            { name: "Kareena Kapoor", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<text x="40" y="85" font-size="15">💅</text>'), speech: "Main apni favorite hoon! Yeh darwaza meri favorite nahi — band karo isko abhi!" },
+            { name: "Sunny Deol", art: MEME_ART.generic("#fbd38d", "#2f855a", '<text x="40" y="85" font-size="15">👊</text>'), speech: "Hindustan Zindabad! Darwaza khol, warna border cross kar ke haath pakad ke kholwaunga!" },
+            { name: "John Abraham", art: MEME_ART.generic("#fbd38d", "#1a202c", '<text x="40" y="85" font-size="15">🏍️</text>'), speech: "Dhoom machale… darwaza khula toh bike pe escape kar lenge, full speed!" },
+            { name: "Priyanka Chopra", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">👑</text>'), speech: "Don ko pakadna mushkil hi nahi… darwaza kholna namumkin hai, baby!" },
+            { name: "Kartik Aaryan", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">🐺</text>'), speech: "Rooh baba bol raha hoon… darwaza khol, bhoot nahi — main hoon, bhediya ban ke!" },
+            { name: "Varun Dhawan", art: MEME_ART.generic("#fbd38d", "#dd6b20", '<text x="40" y="85" font-size="15">🐺</text>'), speech: "Bhediya aa gaya! Darwaza khol, warna main hi ched ke andar ghus jaunga!" },
+            { name: "Sidharth Malhotra", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">🇮🇳</text>'), speech: "Yeh dil maange more… darwaza khulne ka more chance do, warna shershaah ban jaunga!" },
+            { name: "Tiger Shroff", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">🥋</text>'), speech: "Baaghi hoon main… darwaza band karo toh bhi martial arts se tod dunga!" },
+            { name: "Sara Ali Khan", art: MEME_ART.generic("#fbd38d", "#9f7aea", '<text x="40" y="85" font-size="15">🤳</text>'), speech: "Atrangi re… darwaza bhi atrangi, khulega ya sirf sapna dikha ke disappoint karega?" },
+            { name: "Ayushmann", art: MEME_ART.generic("#fbd38d", "#2c5282", '<text x="40" y="85" font-size="15">👱‍♀️</text>'), speech: "Dream girl aa gayi… darwaza khol do, sapna sach kar do, badtameez style mein!" },
+            { name: "Kiara Advani", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<text x="40" y="85" font-size="15">🩺</text>'), speech: "Kabir bol raha hai… darwaza khol, warna dil toot jayega — full intensity!" },
+            { name: "Vivek Oberoi", art: MEME_ART.generic("#fbd38d", "#1a202c", '<text x="40" y="85" font-size="15">🏙️</text>'), speech: "Rishtey mein toh hum tumhare… darwaza lagte hain! Ab khul ja bhai, company style!" },
+            { name: "Irrfan Khan", art: MEME_ART.generic("#fbd38d", "#718096", '<text x="40" y="85" font-size="15">🏃</text>'), speech: "Bhaag Milkha bhaag! Darwaza kholne ke liye bhaagdaud shuru — zindagi short hai!" },
+            { name: "Madhuri Dixit", art: MEME_ART.generic("#fbd38d", "#9f7aea", '<text x="40" y="85" font-size="15">💃</text>'), speech: "Didi tera devar deewana… darwaza khol de na didi, dance sequence shuru karte hain!" },
+            { name: "Anil Kapoor", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">🕶️</text>'), speech: "Picture abhi baaki hai mere dost… darwaza khulne ke baad climax shuru hoga!" },
+            { name: "Farhan Akhtar", art: MEME_ART.generic("#fbd38d", "#4299e1", '<text x="40" y="85" font-size="15">🪂</text>'), speech: "Yeh zindagi na milegi dobara… darwaza khula mile toh bungee jump kar lenge!" },
+            { name: "Kangana Ranaut", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<text x="40" y="85" font-size="15">👑</text>'), speech: "Hungama hai kyun barpa… darwaza khula toh queen entry maaregi!" },
+            { name: "Rajkummar Rao", art: MEME_ART.generic("#fbd38d", "#805ad5", '<text x="40" y="85" font-size="15">👻</text>'), speech: "O stree kal aana… darwaza khula chhod dena, raat ko aaungi bhool bhulaiyaa style!" },
+            { name: "Akshaye Khanna", art: MEME_ART.generic("#fbd38d", "#2d3748", '<text x="40" y="85" font-size="15">🤪</text>'), speech: "Hungama ho gaya… darwaza khula, ab full hungama andar shuru!" }
+        ];
+
+        const INTRO_VISITORS = [
+            { name: "Welcome!", art: MEME_ART.generic("#fbd38d", "#000", '<text x="35" y="85" font-size="20">✨</text>'), speech: "Welcome to the Useless - Infinite Doors!" },
+            { name: "Stay Connected", art: MEME_ART.generic("#fbd38d", "#d53f8c", '<text x="35" y="85" font-size="20">📸</text>'), speech: "Follow @moegical on Instagram for more weird experiments!" },
+            { name: "Support the Art", art: MEME_ART.generic("#fbd38d", "#ed8936", '<text x="35" y="85" font-size="20">☕</text>'), speech: "If you're having fun, you can buy the creator a coffee!" },
+            { name: "Pro Tip", art: MEME_ART.generic("#fbd38d", "#4a5568", '<text x="35" y="85" font-size="15">🥺</text>'), speech: "Coffee ka budget nahi hai to follow hi karlo!" },
+            { name: "Entering the Void", art: SVG_ART.infinite, speech: "Buckle up. The infinite madness starts... NOW!" }
+        ];
+
+        // Create the final sequence: Intro 5 -> Everything else shuffled
+        let ALL_VISITORS = [...INTRO_VISITORS, ...VISITORS, ...MEME_VISITORS, ...REGIONAL_VISITORS, ...BATCH_VISITORS, ...BOLLYWOOD_VISITORS];
+
+        function shuffleVisitors() {
+            // Keep the first 5 intro knocks fixed for promotion
+            const intro = ALL_VISITORS.slice(0, 5);
+            const others = ALL_VISITORS.slice(5).sort(() => Math.random() - 0.5);
+            ALL_VISITORS = [...intro, ...others];
+        }
+
+        // --- STATE & AUDIO ---
+        let knockCount = 0;
+        let isOpen = false;
+        let currentPool = [];
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playKnock() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            [0, 0.08, 0.16].forEach((time, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150 + (i * 10), now + time);
+                osc.frequency.exponentialRampToValueAtTime(40, now + time + 0.1);
+                gain.gain.setValueAtTime(0.6, now + time);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + time + 0.1);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + time);
+                osc.stop(now + time + 0.1);
+            });
+        }
+
+        // --- UI LOGIC ---
+        function initVoid() {
+            const voidEl = document.getElementById('void');
+            for (let i = 0; i < 6; i++) {
+                const neb = document.createElement('div');
+                neb.className = 'nebula';
+                nebulaSize = (Math.random() * 400 + 300);
+                neb.style.cssText = `width:${nebulaSize}px; height:${nebulaSize}px; left:${Math.random() * 100}%; top:${Math.random() * 100}%; background:${i % 2 ? '#1a1a4a' : '#2a0a2a'}; --tx:${(Math.random() - 0.5) * 400}px; --ty:${(Math.random() - 0.5) * 400}px; --duration:${Math.random() * 20 + 20}s;`;
+                voidEl.appendChild(neb);
+            }
+        }
+
+        function initDebris() {
+            const layer = document.getElementById('debris-layer');
+            const icons = [
+                '🔩', '🪴', '📬', '🧦', '🪝', '📸', '📱', '🐦', '🎵', '👻',
+                '🛸', '👽', '🪐', '✨', '⚡', '💫', '☄️', '🌌', '🌠', '🚀',
+                '🧿', '🔮', '🎭', '🎲', '🧩', '🧸', '🎈', '🍕', '🍩', '🍔',
+                '🍟', '🍦', '☕', '🥤', '🍺', '🌮', '🍣', '🌶️', '🥑', '🥩',
+                '🔥', '💧', '💨', '🍀', '🍄', '🌍', '🌋', '⛺', '🗿', '🗽',
+                '💀', '🤡', '👹', '👺', '👻', '🤖', '👾', '🧛', '🧟', '🧞',
+                '😂', '🤣', '😎', '😜', '🤯', '🤫', '🤔', '🤐', '🤑', '🥺'
+            ];
+            for (let i = 0; i < 150; i++) {
+                const d = document.createElement('div');
+                d.className = 'debris';
+                const icon = icons[Math.floor(Math.random() * icons.length)];
+                d.innerText = icon;
+                d.style.cssText = `font-size:${Math.random() * 20 + 10}px; opacity:${Math.random() * 0.5 + 0.3}; left:${Math.random() * 100}%; top:${Math.random() * 100}%; --duration:${Math.random() * 40 + 20}s; --sx:${(Math.random() - 0.5) * 400}px; --sy:${(Math.random() - 0.5) * 400}px; --ex:${(Math.random() - 0.5) * 1000 + window.innerWidth}px; --ey:${(Math.random() - 0.5) * 1000}px; animation-delay:-${Math.random() * 40}s;`;
+                layer.appendChild(d);
+            }
+        }
+
+        function handleKnock(e) {
+            if (isOpen) return;
+            if (e) e.stopPropagation();
+            knockCount++;
+            document.getElementById('knock-count').innerText = knockCount;
+
+            const badge = document.getElementById('counter-badge');
+            badge.classList.remove('knock-pulse');
+            void badge.offsetWidth;
+            badge.classList.add('knock-pulse');
+
+            playKnock();
+
+            const knocker = document.getElementById('knocker-ring');
+            knocker.classList.remove('knock-anim');
+            void knocker.offsetWidth;
+            knocker.classList.add('knock-anim');
+
+            // Door shudder
+            const door = document.getElementById('door-container');
+            door.style.animation = 'none';
+            void door.offsetWidth;
+            door.animate([
+                { transform: 'translateX(0)' },
+                { transform: 'translateX(-4px)' },
+                { transform: 'translateX(4px)' },
+                { transform: 'translateX(0)' }
+            ], { duration: 150 });
+            setTimeout(() => door.style.animation = '', 150);
+
+            setTimeout(revealVisitor, 600);
+        }
+
+        function revealVisitor() {
+            isOpen = true;
+            let visitor;
+
+            if (knockCount <= ALL_VISITORS.length) {
+                visitor = ALL_VISITORS[knockCount - 1];
+            } else {
+                if (currentPool.length === 0) currentPool = [...ALL_VISITORS].sort(() => Math.random() - 0.5);
+                visitor = currentPool.pop();
+            }
+
+            // Update UI
+            document.getElementById('char-name').innerText = visitor.name;
+            const charGraphic = document.getElementById('char-graphic');
+            charGraphic.innerHTML = visitor.art;
+            document.getElementById('char-speech').innerText = `"${visitor.speech}"`;
+
+            // Reset and apply random entrance animation
+            charGraphic.style.animation = 'none';
+            void charGraphic.offsetWidth;
+            const animations = ["floatChar", "slideIn", "zoomPop"];
+            const randAnim = animations[Math.floor(Math.random() * animations.length)];
+            charGraphic.style.animation = `${randAnim} 3s ease-in-out infinite`;
+
+            const tunnel = document.getElementById('infinite-tunnel');
+            // Trigger tunnel for "The Void Master" or "The Infinite"
+            if (visitor.name === "The Void Master" || visitor.name === "The Infinite") {
+                tunnel.innerHTML = '';
+                for (let i = 0; i < 15; i++) {
+                    const l = document.createElement('div');
+                    l.className = 'tunnel-layer';
+                    l.style.animationDelay = (i * 0.2) + 's';
+                    tunnel.appendChild(l);
+                }
+                tunnel.classList.add('visible');
+            } else {
+                tunnel.classList.remove('visible');
+            }
+
+            document.getElementById('door-leaf').classList.add('open');
+            setTimeout(() => document.getElementById('visitor-area').classList.add('visible'), 400);
+        }
+
+
+        function closeDoor() {
+            document.getElementById('visitor-area').classList.remove('visible');
+            setTimeout(() => {
+                document.getElementById('door-leaf').classList.remove('open');
+                document.getElementById('infinite-tunnel').classList.remove('visible');
+                isOpen = false;
+            }, 300);
+        }
+
+        // --- INTERACTION ---
+        function parallax(e) {
+            if (isOpen) return;
+            const x = (window.innerWidth / 2 - e.clientX) / 50;
+            const y = (window.innerHeight / 2 - e.clientY) / 50;
+            document.getElementById('door-container').style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+        }
+
+        // Events
+        document.getElementById('door-leaf').addEventListener('click', handleKnock);
+        document.getElementById('door-leaf').addEventListener('touchstart', (e) => { e.preventDefault(); handleKnock(); });
+        document.getElementById('close-door').addEventListener('click', closeDoor);
+        window.addEventListener('mousemove', parallax);
+        // Global close click
+        window.addEventListener('click', () => {
+            if (isOpen) closeDoor();
+        });
+
+        // Entry
+        window.addEventListener('load', () => {
+            shuffleVisitors();
+            initVoid();
+            initDebris();
+            const container = document.getElementById('door-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(200px) scale(0.8)';
+            setTimeout(() => {
+                container.style.transition = 'all 2s cubic-bezier(0.19, 1, 0.22, 1)';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0) scale(1)';
+            }, 500);
+        });
+
+    </script>
+    <footer>Developed by @moegical</footer>
+</body>
+
+</html>
