@@ -434,7 +434,8 @@
             opacity: 0;
             pointer-events: none;
             transition: all 0.5s ease;
-            z-index: 10;
+            z-index: 1;
+            /* Fixes overlay bug */
             padding: 10px;
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
@@ -927,6 +928,7 @@
         let currentPool = [];
         let audioCtx;
         let clickTimes = [];
+        let revealTimeout;
 
         function playErrorTone() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1058,7 +1060,8 @@
             ], { duration: 150 });
             setTimeout(() => door.style.animation = '', 150);
 
-            setTimeout(revealVisitor, 600);
+            clearTimeout(revealTimeout);
+            revealTimeout = setTimeout(revealVisitor, 600);
         }
 
         function revealVisitor() {
