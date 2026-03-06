@@ -330,6 +330,16 @@
             z-index: 100;
         }
 
+        .app-title {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Baloo 2', cursive;
+            color: var(--accent-neon);
+        }
+
         .counter-badge h2 {
             font-family: 'Baloo 2', cursive;
             font-size: 2.2rem;
@@ -563,6 +573,52 @@
                 opacity: 1;
             }
         }
+
+        @media (max-width: 600px) {
+            .door-container {
+                transform: scale(0.8);
+            }
+
+            @keyframes bobbing {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotateZ(0.5deg) scale(0.8);
+                }
+
+                50% {
+                    transform: translateY(-15px) rotateZ(-0.5deg) scale(0.82);
+                }
+            }
+
+            .counter-badge {
+                top: 15px;
+                right: 15px;
+                padding: 12px 20px;
+                border-width: 1px;
+            }
+
+            .app-title {
+                font-size: 0.6rem;
+            }
+
+            .counter-badge h2 {
+                font-size: 1.5rem;
+            }
+
+            #knock-count {
+                font-size: 2rem;
+            }
+
+            .counter-badge p {
+                font-size: 0.75rem;
+            }
+
+            footer {
+                font-size: 0.75rem;
+                letter-spacing: 1px;
+            }
+        }
     </style>
 </head>
 
@@ -575,9 +631,7 @@
     <div class="debris-layer" id="debris-layer"></div>
 
     <div class="counter-badge" id="counter-badge" aria-live="polite">
-        <h2
-            style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px;">
-            Useless App - Infinite Doors</h2>
+        <h2 class="app-title">Useless App - Infinite Doors</h2>
         <h2>KNOCKS: <span id="knock-count">0</span></h2>
         <p id="status-hint">Who's next...?</p>
     </div>
