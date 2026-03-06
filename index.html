@@ -148,7 +148,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-clip-path: inset(0);
+            clip-path: inset(0);
             -webkit-transform: translateZ(-10px);
             transform: translateZ(-10px);
         }
@@ -416,6 +419,8 @@
             transition: all 0.5s ease;
             z-index: 10;
             padding: 10px;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
             -webkit-transform: translateZ(1px);
             transform: translateZ(1px);
         }
@@ -648,13 +653,13 @@
     <div class="door-container" id="door-container">
         <div class="door-frame" aria-label="A mysterious floating door">
             <div class="infinite-tunnel" id="infinite-tunnel"></div>
+        </div>
 
-            <div class="visitor-area" id="visitor-area">
-                <div class="character-name" id="char-name">Visitor</div>
-                <div class="character-graphic" id="char-graphic"></div>
-                <div class="speech-bubble" id="char-speech">"..."</div>
-                <button class="close-door-btn" id="close-door">Close Door 🚪</button>
-            </div>
+        <div class="visitor-area" id="visitor-area">
+            <div class="character-name" id="char-name">Visitor</div>
+            <div class="character-graphic" id="char-graphic"></div>
+            <div class="speech-bubble" id="char-speech">"..."</div>
+            <button class="close-door-btn" id="close-door">Close Door 🚪</button>
         </div>
 
         <div class="door-leaf" id="door-leaf" aria-label="Knock on the door" role="button">
